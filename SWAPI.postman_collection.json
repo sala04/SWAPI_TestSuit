@@ -1,0 +1,591 @@
+{
+  "info": {
+    "_postman_id": "9863a2bd-3667-47d5-937c-073b6b97ee77",
+    "name": "SWAPI",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "32874571"
+  },
+  "item": [
+    {
+      "name": "People",
+      "item": [
+        {
+          "name": "GET All people",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//status code\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "//response time\r",
+                  "pm.test(\"Response time is under 1000ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+                  "});\r",
+                  "\r",
+                  "//json schema\r",
+                  "const jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Response has required fields\", function () {\r",
+                  "    pm.expect(jsonData).to.have.property(\"count\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"next\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"previous\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"results\");\r",
+                  "});\r",
+                  "\r",
+                  "//type validations\r",
+                  "pm.test(\"Type validations\", function () {\r",
+                  "\r",
+                  "    pm.expect(jsonData.count).to.be.a(\"number\");\r",
+                  "    pm.expect(jsonData.count).to.be.above(0);\r",
+                  "    if (jsonData.next !== null) {\r",
+                  "        pm.expect(jsonData.next).to.be.a(\"string\");\r",
+                  "        pm.expect(jsonData.next).to.match(/^https?:\\/\\/.+\\/people\\/\\?page=\\d+$/);\r",
+                  "    }\r",
+                  "    if (jsonData.previous !== null) {\r",
+                  "        pm.expect(jsonData.previous).to.be.a(\"string\");\r",
+                  "        pm.expect(jsonData.previous).to.match(/^https?:\\/\\/.+\\/people\\/\\?page=\\d+$/);\r",
+                  "    }\r",
+                  "    pm.expect(jsonData.results).to.be.an(\"array\");\r",
+                  "    if (jsonData.count > 0) { //if count is not 0, result array should not be empty\r",
+                  "        pm.expect(jsonData.results.length).to.be.above(0);\r",
+                  "    }\r",
+                  "\r",
+                  "\r",
+                  "});\r",
+                  "//pagination logic\r",
+                  "pm.test(\"Pagination logic\", function () {\r",
+                  "    if (jsonData.previous === null) {\r",
+                  "        pm.expect(jsonData.next).to.not.equal(null);\r",
+                  "    }\r",
+                  "    else if (jsonData.next === null) {\r",
+                  "        pm.expect(jsonData.previous).to.not.equal(null);\r",
+                  "    }\r",
+                  "});\r",
+                  "//structure minimal check (to be tested completely in GET person by id endpoint\r",
+                  "pm.test(\"Each result has minimal structure\", function () {\r",
+                  "    jsonData.results.forEach(result => {\r",
+                  "        pm.expect(result).to.have.property(\"name\");\r",
+                  "        pm.expect(result).to.have.property(\"url\");\r",
+                  "        pm.expect(result.url).to.match(/^https?:\\/\\/.+\\/people\\/\\d+\\/$/);\r",
+                  "    });\r",
+                  "\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/people",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "people"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET person by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//status code\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "//response time\r",
+                  "pm.test(\"Response time is under 1000ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+                  "});\r",
+                  "\r",
+                  "//json schema\r",
+                  "const jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Required fields\", function () {\r",
+                  "    pm.expect(jsonData).to.have.property(\"name\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"height\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"mass\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"hair_color\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"skin_color\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"eye_color\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"birth_year\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"gender\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"homeworld\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"films\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"species\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"vehicles\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"starships\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"created\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"edited\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"url\");\r",
+                  "});\r",
+                  "\r",
+                  "//type validations\r",
+                  "pm.test(\"Type validations\", function () {\r",
+                  "    pm.expect(jsonData.name).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.hair_color).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.skin_color).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.eye_color).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.birth_year).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.gender).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.height).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.mass).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.homeworld).to.match(/^https?:\\/\\/.+\\/planets\\/\\d+\\/$/);\r",
+                  "    pm.expect(jsonData.films).to.be.an(\"array\");\r",
+                  "    pm.expect(jsonData.species).to.be.an(\"array\");\r",
+                  "    pm.expect(jsonData.vehicles).to.be.an(\"array\");\r",
+                  "    pm.expect(jsonData.starships).to.be.an(\"array\");\r",
+                  "    jsonData.films.forEach(url => {\r",
+                  "        pm.expect(url).to.match(/^https?:\\/\\/.+\\/films\\/\\d+\\/$/);\r",
+                  "    });\r",
+                  "    jsonData.species.forEach(url => {\r",
+                  "        pm.expect(url).to.match(/^https?:\\/\\/.+\\/species\\/\\d+\\/$/);\r",
+                  "    });\r",
+                  "    jsonData.vehicles.forEach(url => {\r",
+                  "        pm.expect(url).to.match(/^https?:\\/\\/.+\\/vehicles\\/\\d+\\/$/);\r",
+                  "    });\r",
+                  "    jsonData.starships.forEach(url => {\r",
+                  "        pm.expect(url).to.match(/^https?:\\/\\/.+\\/starships\\/\\d+\\/$/);\r",
+                  "    });\r",
+                  "    pm.expect(jsonData.created).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d+Z$/);\r",
+                  "    pm.expect(jsonData.edited).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d+Z$/);\r",
+                  "    pm.expect(jsonData.url).to.match(/^https?:\\/\\/.+\\/people\\/\\d+\\/$/);\r",
+                  "\r",
+                  "});\r",
+                  "\r",
+                  "//save some person data for later cross-check\r",
+                  "pm.environment.set(\"person_planet_url\", jsonData.homeworld);\r",
+                  "pm.environment.set(\"person_film_url\", jsonData.films[0]);\r",
+                  "pm.environment.set(\"person_starship\", jsonData.starships[0])\r",
+                  "pm.environment.set(\"person_url\", jsonData.url);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/people/{{person_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "people",
+                "{{person_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET invalid person 9999",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//status code\r",
+                  "pm.test(\"Status code is 404\", function () {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  "//response time\r",
+                  "pm.test(\"Response time is under 1000ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+                  "});\r",
+                  "\r",
+                  "//json schema\r",
+                  "const jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Response body\", function () {\r",
+                  "    pm.expect(jsonData).to.have.property(\"detail\");\r",
+                  "    pm.expect(jsonData.detail).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.detail).to.equal(\"Not found\");\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/people/9999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "people",
+                "9999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET invalid person A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//status code\r",
+                  "pm.test(\"Status code is 404\", function () {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  "//response time\r",
+                  "pm.test(\"Response time is under 1000ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+                  "});\r",
+                  "\r",
+                  "//json schema\r",
+                  "const jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Response body\", function () {\r",
+                  "    pm.expect(jsonData).to.have.property(\"detail\");\r",
+                  "    pm.expect(jsonData.detail).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.detail).to.equal(\"Not found\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/people/A",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "people",
+                "A"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Starships",
+      "item": [
+        {
+          "name": "GET starship by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//status code\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "//response time\r",
+                  "pm.test(\"Response time is under 1000ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+                  "});\r",
+                  "\r",
+                  "//json schema\r",
+                  "const jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Required fields\", function () {\r",
+                  "    pm.expect(jsonData).to.have.property(\"name\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"model\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"manufacturer\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"cost_in_credits\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"length\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"max_atmosphering_speed\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"crew\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"passengers\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"cargo_capacity\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"consumables\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"hyperdrive_rating\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"MGLT\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"starship_class\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"pilots\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"films\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"created\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"edited\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"url\");\r",
+                  "});\r",
+                  "\r",
+                  "//type validations\r",
+                  "pm.test(\"Type validations\", function () {\r",
+                  "    pm.expect(jsonData.name).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.model).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.manufacturer).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.cost_in_credits).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.length).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.max_atmosphering_speed).to.be.an(\"string\");\r",
+                  "    pm.expect(jsonData.crew).to.be.an(\"string\");\r",
+                  "    pm.expect(jsonData.passengers).to.be.an(\"string\");\r",
+                  "    pm.expect(jsonData.cargo_capacity).to.be.an(\"string\");\r",
+                  "    pm.expect(jsonData.consumables).to.be.an(\"string\");\r",
+                  "    pm.expect(jsonData.hyperdrive_rating).to.be.an(\"string\");\r",
+                  "    pm.expect(jsonData.MGLT).to.be.an(\"string\");\r",
+                  "    pm.expect(jsonData.starship_class).to.be.an(\"string\");\r",
+                  "    pm.expect(jsonData.MGLT).to.be.an(\"string\");\r",
+                  "    pm.expect(jsonData.created).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d+Z$/);\r",
+                  "    pm.expect(jsonData.edited).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d+Z$/);\r",
+                  "    pm.expect(jsonData.films ).to.be.an(\"array\");\r",
+                  "    pm.expect(jsonData.pilots).to.be.an(\"array\");\r",
+                  "    pm.expect(jsonData.url).to.match(/^https?:\\/\\/.+\\/starships\\/\\d+\\/$/);\r",
+                  "    jsonData.films.forEach(url => {\r",
+                  "        pm.expect(url).to.match(/^https?:\\/\\/.+\\/films\\/\\d+\\/$/);\r",
+                  "    });\r",
+                  "    jsonData.pilots.forEach(url => {\r",
+                  "        pm.expect(url).to.match(/^https?:\\/\\/.+\\/pilots\\/\\d+\\/$/);\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/starships/9",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "starships",
+                "9"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cross check starship response info",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//status code\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "//response time\r",
+                  "pm.test(\"Response time is under 1000ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+                  "});\r",
+                  "\r",
+                  "//json schema\r",
+                  "const jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Check data consistency\", function() {\r",
+                  "    const person_url = pm.environment.get(\"person_url\");\r",
+                  "    pm.expect(jsonData.pilots).to.include(person_url);\r",
+                  "\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{person_starship}}",
+              "host": [
+                "{{person_starship}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Films",
+      "item": [
+        {
+          "name": "GET film by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//status code\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "//response time\r",
+                  "pm.test(\"Response time is under 1000ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+                  "});\r",
+                  "\r",
+                  "//json schema\r",
+                  "const jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Required fields\", function () {\r",
+                  "    pm.expect(jsonData).to.have.property(\"title\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"episode_id\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"opening_crawl\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"director\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"producer\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"release_date\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"characters\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"planets\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"starships\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"vehicles\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"species\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"created\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"edited\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"url\");\r",
+                  "});\r",
+                  "\r",
+                  "//type validations\r",
+                  "pm.test(\"Type validations\", function () {\r",
+                  "    pm.expect(jsonData.title).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.opening_crawl).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.director).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.producer).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonData.episode_id).to.be.a(\"number\");\r",
+                  "    pm.expect(jsonData.release_date).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\r",
+                  "    pm.expect(jsonData.characters).to.be.an(\"array\");\r",
+                  "    pm.expect(jsonData.planets).to.be.an(\"array\");\r",
+                  "    pm.expect(jsonData.starships).to.be.an(\"array\");\r",
+                  "    pm.expect(jsonData.vehicles).to.be.an(\"array\");\r",
+                  "    pm.expect(jsonData.species).to.be.an(\"array\");\r",
+                  "    jsonData.characters.forEach(url => {\r",
+                  "        pm.expect(url).to.match(/^https?:\\/\\/.+\\/people\\/\\d+\\/$/);\r",
+                  "    });\r",
+                  "    jsonData.planets.forEach(url => {\r",
+                  "        pm.expect(url).to.match(/^https?:\\/\\/.+\\/planets\\/\\d+\\/$/);\r",
+                  "    });\r",
+                  "    jsonData.starships.forEach(url => {\r",
+                  "        pm.expect(url).to.match(/^https?:\\/\\/.+\\/starships\\/\\d+\\/$/);\r",
+                  "    });\r",
+                  "    jsonData.vehicles.forEach(url => {\r",
+                  "        pm.expect(url).to.match(/^https?:\\/\\/.+\\/vehicles\\/\\d+\\/$/);\r",
+                  "    });\r",
+                  "    jsonData.species.forEach(url => {\r",
+                  "        pm.expect(url).to.match(/^https?:\\/\\/.+\\/species\\/\\d+\\/$/);\r",
+                  "    });\r",
+                  "    pm.expect(jsonData.created).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d+Z$/);\r",
+                  "    pm.expect(jsonData.edited).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d+Z$/);\r",
+                  "    pm.expect(jsonData.url).to.match(/^https?:\\/\\/.+\\/films\\/\\d+\\/$/);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/films/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "films",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cross check film response info",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//status code\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "//response time\r",
+                  "pm.test(\"Response time is under 1000ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+                  "});\r",
+                  "\r",
+                  "//json schema\r",
+                  "const jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Check data consistency\", function() {\r",
+                  "    const person_url = pm.environment.get(\"person_url\");\r",
+                  "    pm.expect(jsonData.characters).to.include(person_url);\r",
+                  "\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{person_film_url}}",
+              "host": [
+                "{{person_film_url}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
